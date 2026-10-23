@@ -1,52 +1,91 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Admin from '@/components/Admin.vue'
-import LandingPage from '@/components/LandingPage.vue'
-import Login from '@/views/Login.vue'
-import Products from '@/components/Products.vue'
-import Profile from '@/components/Profile.vue'
-import Signup from '@/views/Signup.vue'
-import ViewProduct from '@/components/ViewProduct.vue'
-import Orders from '@/components/Orders.vue'
-import { components } from 'vuetify/dist/vuetify.js'
+import HomeView from '../views/HomeView.vue'
+import AboutView from '../views/AboutView.vue'
+import LoginPage from '../views/LoginPage.vue'
+import SignUp from '../views/SignUp.vue'
+import WelcomePage from '../views/WelcomePage.vue'
+import TokenService from '../services/tokenService.js'
+import RolesPage from '@/views/RolesPage.vue'
+import CategoriesPage from '@/views/CategoriesPage.vue'
+import UsersPage from '@/views/UsersPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/admin',
-      component: Admin
+      path: '/',
+      name: 'home',
+      component: HomeView,
     },
     {
-      path: '/',
-      component: LandingPage
+      path: '/about-us',
+      name: 'about',
+      component: AboutView,
     },
     {
       path: '/login',
-      component: Login
+      name: 'LoginPage',
+      component: LoginPage,
     },
     {
-      path: '/products',
-      component: Products
+      path: '/sign-up',
+      name: 'SignUp',
+      component: SignUp,
     },
     {
-      path: '/profile',
-      component: Profile
+      path: '/welcome',
+      name: 'Welcome',
+      component: WelcomePage,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
-      path: '/signup',
-      component: Signup
+      path: '/roles',
+      name: 'RolesPage',
+      component: RolesPage,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
-      path: '/orders',
-      component:  Orders
+      path: '/categories',
+      name: 'CategoriessPage',
+      component: CategoriesPage,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
-      name: 'ViewProduct',
-      path: '/viewproduct',
-      component: ViewProduct,
-      props: route => ({id: Number(route.params.id)})
+      path: '/users',
+      name: 'UsersPage',
+      component: UsersPage,
+        meta: {
+        requiresAuth: true,
+      },
     },
   ],
+})
+// Navigation guard
+router.beforeEach((to) => {
+  const loggedIn = TokenService.isAuthenticated()
+
+  // Require authentication
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!loggedIn) {
+      return {
+        name: 'LoginPage',
+        query: { redirect: to.fullPath },
+      }
+    }
+  }
+
+  // Redirect authenticated users away from guest-only pages
+  if (to.matched.some(record => record.meta.guestOnly) && loggedIn) {
+    return { name: 'home' }
+  }
+
+  return true
 })
 
 export default router
