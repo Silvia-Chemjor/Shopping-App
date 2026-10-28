@@ -116,8 +116,6 @@ const headers = [
   { title: 'ID', key: 'id', align: 'start' },
   { title: 'Name', key: 'name' },
   { title: 'Email', key: 'email' },
-  { title: 'Password', key: 'password' },
-  { title: 'Password Confirmation', key: 'password_confirmation' },
   { title: 'Actions', key: 'actions', align: 'end', sortable: false },
 ]
 
